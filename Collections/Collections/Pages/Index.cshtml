@@ -1,0 +1,12 @@
+﻿@page
+@model Collections.Pages.IndexModel
+@{
+    Layout = "Shared/_Layout";
+}
+
+@foreach (var name in Model.UserNames)
+{
+    <p>
+        @name
+    </p>
+}
