@@ -1,0 +1,36 @@
+﻿@using Collections.General
+@model Collections.Models.Collection.CollectionSimpleModel
+
+@{
+    var imageUrl = string.IsNullOrEmpty(Model.Image) ? "https://via.placeholder.com/150" : Model.Image;
+}
+<div class="card m-1" style="width: 18rem;">
+    <img class="card-img-top" src="@imageUrl" alt="@imageUrl.Split("/")[^1]">
+    <div class="card-body">
+        <div class="row">
+            <h5 class="card-title col">
+                @Html.ActionLink(Model.Title ?? "Null", "Details", "Collection", new { Id = Model?.Id ?? 0 }, new { @class = "btn-link" })
+            </h5>
+            <span class="col-4">Items: @Model.ItemsCount </span>
+        </div>
+        <p class="card-text">
+            <markdown>
+                @Model.Description
+            </markdown>
+        </p>
+    </div>
+    <div class="card-footer">
+        <div class="row">
+            <div class="col"></div>
+            <div class="col-5 align-content-center">
+                <a asp-action="Details" asp-controller="Collection" asp-route-id="@Model.Id" >More >> </a>
+            </div>
+            <div class="col">
+                @if (User.IsInRole(Constants.Roles.Admin) || string.Equals(User?.Identity?.Name, Model?.Owner?.UserName ?? string.Empty, StringComparison.OrdinalIgnoreCase))
+                {
+                    <a class="btn-link" asp-controller="Collection" asp-action="Delete" asp-route-id="@Model.Id" >Delete</a>
+                }
+            </div>
+        </div>
+    </div>
+</div>

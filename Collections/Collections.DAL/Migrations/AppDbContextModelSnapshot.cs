@@ -32,57 +32,68 @@ namespace Collections.DAL.Migrations
                     b.Property<string>("Image")
                         .HasColumnType("text");
 
+                    b.Property<int?>("OwnerId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ThemeId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Title")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("OwnerId");
+
+                    b.HasIndex("ThemeId");
+
+                    b.HasIndex("Title", "Description")
+                        .HasMethod("GIN")
+                        .HasAnnotation("Npgsql:TsVectorConfig", "english");
+
                     b.ToTable("Collections");
                 });
 
-            modelBuilder.Entity("Collections.DAL.Entities.CollectionItem", b =>
+            modelBuilder.Entity("Collections.DAL.Entities.Comment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .UseIdentityByDefaultColumn();
 
-                    b.Property<int>("CollectionId")
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("ItemId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Name")
+                    b.Property<int?>("SenderId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Text")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CollectionId");
+                    b.HasIndex("ItemId");
 
-                    b.ToTable("CollectionItems");
+                    b.HasIndex("SenderId");
+
+                    b.HasIndex("Text")
+                        .HasMethod("GIN")
+                        .HasAnnotation("Npgsql:TsVectorConfig", "english");
+
+                    b.ToTable("Comment");
                 });
 
-            modelBuilder.Entity("Collections.DAL.Entities.CollectionItemTag", b =>
-                {
-                    b.Property<int>("CollectionItemId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TagId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("CollectionItemId", "TagId");
-
-                    b.HasIndex("TagId");
-
-                    b.ToTable("ItemsTags");
-                });
-
-            modelBuilder.Entity("Collections.DAL.Entities.CustomField", b =>
+            modelBuilder.Entity("Collections.DAL.Entities.Field", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .UseIdentityByDefaultColumn();
 
-                    b.Property<int>("CollectionId")
+                    b.Property<int?>("CollectionId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Name")
@@ -95,50 +106,10 @@ namespace Collections.DAL.Migrations
 
                     b.HasIndex("CollectionId");
 
-                    b.ToTable("CustomFields");
+                    b.ToTable("FieldDef");
                 });
 
-            modelBuilder.Entity("Collections.DAL.Entities.CustomFieldValue", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .UseIdentityByDefaultColumn();
-
-                    b.Property<int>("CollectionItemId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("CustomFieldId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CollectionItemId");
-
-                    b.HasIndex("CustomFieldId");
-
-                    b.ToTable("CustomFieldValues");
-                });
-
-            modelBuilder.Entity("Collections.DAL.Entities.Tag", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .UseIdentityByDefaultColumn();
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Tags");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
+            modelBuilder.Entity("Collections.DAL.Entities.Identity.AppRole", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -147,10 +118,6 @@ namespace Collections.DAL.Migrations
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
@@ -169,33 +136,17 @@ namespace Collections.DAL.Migrations
 
                     b.ToTable("AspNetRoles");
 
-                    b.HasDiscriminator<string>("Discriminator").HasValue("IdentityRole<int>");
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ConcurrencyStamp = "28faed5d-e9e5-48a3-82f2-ddee60774233",
+                            Name = "admin",
+                            NormalizedName = "ADMIN"
+                        });
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .UseIdentityByDefaultColumn();
-
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("text");
-
-                    b.Property<int>("RoleId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetRoleClaims");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser<int>", b =>
+            modelBuilder.Entity("Collections.DAL.Entities.Identity.AppUser", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -209,16 +160,15 @@ namespace Collections.DAL.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("text");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
+
+                    b.Property<int?>("ItemId")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");
@@ -255,6 +205,8 @@ namespace Collections.DAL.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ItemId");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -264,7 +216,154 @@ namespace Collections.DAL.Migrations
 
                     b.ToTable("AspNetUsers");
 
-                    b.HasDiscriminator<string>("Discriminator").HasValue("IdentityUser<int>");
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "7dd7faf4-f047-4db2-8189-8e1ccf0cdb82",
+                            Email = "admin@icp.cc",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "admin@icp.cc",
+                            NormalizedUserName = "ADMIN@ICP.CC",
+                            PasswordHash = "AQAAAAEAACcQAAAAELQoJf15ChXp1KSpdPlUsr1HtjDrlrRwmYcAGoBs66SaG3Qdux5oS35CPdHYOxaHpQ==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "df502f61-938f-44fc-adcb-6e56cf8c8ebf",
+                            TwoFactorEnabled = false,
+                            UserName = "ADMIN@ICP.CC"
+                        });
+                });
+
+            modelBuilder.Entity("Collections.DAL.Entities.Item", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<int?>("CollectionId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CollectionId");
+
+                    b.HasIndex("Name")
+                        .HasMethod("GIN")
+                        .HasAnnotation("Npgsql:TsVectorConfig", "english");
+
+                    b.ToTable("Items");
+                });
+
+            modelBuilder.Entity("Collections.DAL.Entities.Tag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tags");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "SomeTag"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "SomeTag2"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Lamba"
+                        });
+                });
+
+            modelBuilder.Entity("Collections.DAL.Entities.Theme", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Themes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Alcohol"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Cars"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Books"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Games"
+                        });
+                });
+
+            modelBuilder.Entity("ItemTag", b =>
+                {
+                    b.Property<int>("ItemTagsId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TagsId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ItemTagsId", "TagsId");
+
+                    b.HasIndex("TagsId");
+
+                    b.ToTable("ItemTag");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("text");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
@@ -319,22 +418,21 @@ namespace Collections.DAL.Migrations
                     b.Property<int>("RoleId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("UserId", "RoleId");
 
-                    b.HasIndex("RoleId");
-
                     b.ToTable("AspNetUserRoles");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("IdentityUserRole<int>");
 
                     b.HasData(
                         new
                         {
                             UserId = 1,
                             RoleId = 1
-                        },
-                        new
-                        {
-                            UserId = 2,
-                            RoleId = 2
                         });
                 });
 
@@ -357,127 +455,120 @@ namespace Collections.DAL.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("Collections.DAL.Entities.Identity.AppRole", b =>
+            modelBuilder.Entity("Collections.DAL.Entities.FieldValue", b =>
                 {
-                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityRole<int>");
+                    b.HasBaseType("Collections.DAL.Entities.Field");
 
-                    b.HasDiscriminator().HasValue("AppRole");
+                    b.Property<int>("FieldId")
+                        .HasColumnType("integer");
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ConcurrencyStamp = "fb144772-1639-41bd-8b75-bd1cd0f8ed01",
-                            Name = "admin"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            ConcurrencyStamp = "8d6e6415-ca13-456e-aab5-8f11e5e96080",
-                            Name = "customer"
-                        });
+                    b.Property<int?>("ItemId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("text");
+
+                    b.HasIndex("ItemId");
+
+                    b.HasIndex("Value")
+                        .HasMethod("GIN")
+                        .HasAnnotation("Npgsql:TsVectorConfig", "english");
+
+                    b.ToTable("FieldValue");
+                });
+
+            modelBuilder.Entity("Collections.DAL.Entities.Identity.AppUserRole", b =>
+                {
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUserRole<int>");
+
+                    b.Property<int?>("AppRoleId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("AppUserId")
+                        .HasColumnType("integer");
+
+                    b.HasIndex("AppRoleId");
+
+                    b.HasIndex("AppUserId");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasDiscriminator().HasValue("AppUserRole");
+                });
+
+            modelBuilder.Entity("Collections.DAL.Entities.Collection", b =>
+                {
+                    b.HasOne("Collections.DAL.Entities.Identity.AppUser", "Owner")
+                        .WithMany("Collections")
+                        .HasForeignKey("OwnerId");
+
+                    b.HasOne("Collections.DAL.Entities.Theme", "Theme")
+                        .WithMany("Collections")
+                        .HasForeignKey("ThemeId");
+
+                    b.Navigation("Owner");
+
+                    b.Navigation("Theme");
+                });
+
+            modelBuilder.Entity("Collections.DAL.Entities.Comment", b =>
+                {
+                    b.HasOne("Collections.DAL.Entities.Item", "Item")
+                        .WithMany("Comments")
+                        .HasForeignKey("ItemId");
+
+                    b.HasOne("Collections.DAL.Entities.Identity.AppUser", "Sender")
+                        .WithMany("Comments")
+                        .HasForeignKey("SenderId");
+
+                    b.Navigation("Item");
+
+                    b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("Collections.DAL.Entities.Field", b =>
+                {
+                    b.HasOne("Collections.DAL.Entities.Collection", "Collection")
+                        .WithMany("Fields")
+                        .HasForeignKey("CollectionId");
+
+                    b.Navigation("Collection");
                 });
 
             modelBuilder.Entity("Collections.DAL.Entities.Identity.AppUser", b =>
                 {
-                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser<int>");
-
-                    b.HasDiscriminator().HasValue("AppUser");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "145be7dd-e76f-4db4-9feb-de9234bcbf24",
-                            Email = "admin@icp.cc",
-                            EmailConfirmed = true,
-                            LockoutEnabled = false,
-                            NormalizedEmail = "admin@icp.cc",
-                            PasswordHash = "AQAAAAEAACcQAAAAECI014RQ7pYmymQaD0iEAv7CpJQzVsqWCQhVTjlcEBqA2lS8OaudPAkdDQlTkAanlQ==",
-                            PhoneNumberConfirmed = false,
-                            TwoFactorEnabled = false,
-                            UserName = "admin"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "548b4dc6-2e4d-4f86-818e-bdc96fff8914",
-                            Email = "user@icp.cc",
-                            EmailConfirmed = true,
-                            LockoutEnabled = false,
-                            NormalizedEmail = "user@icp.cc",
-                            PasswordHash = "AQAAAAEAACcQAAAAEBhdkBQpUELSMLmR8Cjnq+MSsyIpMO2F5wFtoAGwEECFYIdRIhcLeOZbXZ/HsLlH+g==",
-                            PhoneNumberConfirmed = false,
-                            TwoFactorEnabled = false,
-                            UserName = "customer"
-                        });
+                    b.HasOne("Collections.DAL.Entities.Item", null)
+                        .WithMany("Likes")
+                        .HasForeignKey("ItemId");
                 });
 
-            modelBuilder.Entity("Collections.DAL.Entities.CollectionItem", b =>
+            modelBuilder.Entity("Collections.DAL.Entities.Item", b =>
                 {
                     b.HasOne("Collections.DAL.Entities.Collection", "Collection")
                         .WithMany("Items")
-                        .HasForeignKey("CollectionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CollectionId");
 
                     b.Navigation("Collection");
                 });
 
-            modelBuilder.Entity("Collections.DAL.Entities.CollectionItemTag", b =>
+            modelBuilder.Entity("ItemTag", b =>
                 {
-                    b.HasOne("Collections.DAL.Entities.CollectionItem", "CollectionItem")
-                        .WithMany("ItemsTags")
-                        .HasForeignKey("CollectionItemId")
+                    b.HasOne("Collections.DAL.Entities.Item", null)
+                        .WithMany()
+                        .HasForeignKey("ItemTagsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Collections.DAL.Entities.Tag", "Tag")
-                        .WithMany("ItemTags")
-                        .HasForeignKey("TagId")
+                    b.HasOne("Collections.DAL.Entities.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("CollectionItem");
-
-                    b.Navigation("Tag");
-                });
-
-            modelBuilder.Entity("Collections.DAL.Entities.CustomField", b =>
-                {
-                    b.HasOne("Collections.DAL.Entities.Collection", "Collection")
-                        .WithMany("Fields")
-                        .HasForeignKey("CollectionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Collection");
-                });
-
-            modelBuilder.Entity("Collections.DAL.Entities.CustomFieldValue", b =>
-                {
-                    b.HasOne("Collections.DAL.Entities.CollectionItem", "CollectionItem")
-                        .WithMany("CustomFieldValues")
-                        .HasForeignKey("CollectionItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Collections.DAL.Entities.CustomField", "CustomField")
-                        .WithMany("Values")
-                        .HasForeignKey("CustomFieldId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CollectionItem");
-
-                    b.Navigation("CustomField");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", null)
+                    b.HasOne("Collections.DAL.Entities.Identity.AppRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -486,7 +577,7 @@ namespace Collections.DAL.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser<int>", null)
+                    b.HasOne("Collections.DAL.Entities.Identity.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -495,22 +586,7 @@ namespace Collections.DAL.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser<int>", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser<int>", null)
+                    b.HasOne("Collections.DAL.Entities.Identity.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -519,11 +595,53 @@ namespace Collections.DAL.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser<int>", null)
+                    b.HasOne("Collections.DAL.Entities.Identity.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Collections.DAL.Entities.FieldValue", b =>
+                {
+                    b.HasOne("Collections.DAL.Entities.Field", null)
+                        .WithOne()
+                        .HasForeignKey("Collections.DAL.Entities.FieldValue", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Collections.DAL.Entities.Item", "Item")
+                        .WithMany("Fields")
+                        .HasForeignKey("ItemId");
+
+                    b.Navigation("Item");
+                });
+
+            modelBuilder.Entity("Collections.DAL.Entities.Identity.AppUserRole", b =>
+                {
+                    b.HasOne("Collections.DAL.Entities.Identity.AppRole", null)
+                        .WithMany("UserRoles")
+                        .HasForeignKey("AppRoleId");
+
+                    b.HasOne("Collections.DAL.Entities.Identity.AppUser", null)
+                        .WithMany("UserRoles")
+                        .HasForeignKey("AppUserId");
+
+                    b.HasOne("Collections.DAL.Entities.Identity.AppRole", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Collections.DAL.Entities.Identity.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Collections.DAL.Entities.Collection", b =>
@@ -533,21 +651,32 @@ namespace Collections.DAL.Migrations
                     b.Navigation("Items");
                 });
 
-            modelBuilder.Entity("Collections.DAL.Entities.CollectionItem", b =>
+            modelBuilder.Entity("Collections.DAL.Entities.Identity.AppRole", b =>
                 {
-                    b.Navigation("CustomFieldValues");
-
-                    b.Navigation("ItemsTags");
+                    b.Navigation("UserRoles");
                 });
 
-            modelBuilder.Entity("Collections.DAL.Entities.CustomField", b =>
+            modelBuilder.Entity("Collections.DAL.Entities.Identity.AppUser", b =>
                 {
-                    b.Navigation("Values");
+                    b.Navigation("Collections");
+
+                    b.Navigation("Comments");
+
+                    b.Navigation("UserRoles");
                 });
 
-            modelBuilder.Entity("Collections.DAL.Entities.Tag", b =>
+            modelBuilder.Entity("Collections.DAL.Entities.Item", b =>
                 {
-                    b.Navigation("ItemTags");
+                    b.Navigation("Comments");
+
+                    b.Navigation("Fields");
+
+                    b.Navigation("Likes");
+                });
+
+            modelBuilder.Entity("Collections.DAL.Entities.Theme", b =>
+                {
+                    b.Navigation("Collections");
                 });
 #pragma warning restore 612, 618
         }

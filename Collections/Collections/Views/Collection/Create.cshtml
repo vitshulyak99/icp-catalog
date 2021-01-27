@@ -1,0 +1,55 @@
+﻿@model global::Collections.Models.Collection.CollectionCreateViewModel
+@{
+    ViewBag.Title = "Create collection";
+    Layout = "_Layout";
+}
+<div>
+    <div>
+        <div class="form-group">
+            <label for="title">title</label>
+            <input type="text" class="form-control" id="title" placeholder="Type title">
+        </div>
+        <div class="form-group">
+            <label class="title" for="theme"> Theme </label>
+            <select name="theme" class="form-control" id="theme">
+                @foreach (var theme in Model.Themes)
+                {
+                    <option value="@theme.Id"> @theme.Name </option>
+                }
+            </select>
+        </div>
+        <partial name="Collection/_ImageWithPrev" />
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" class="form-control" style="height:100px" name="description" oninput="this.editor.update()" placeholder="Type description. MarkdownTagHelper supported"></textarea>
+        </div>
+        <div class="form-group">
+            <label class="title" for="markdown-prev">Preview</label>
+            <div class="form-control pre-scrollable" style="height:100px" id="markdown-prev"></div>
+        </div>
+        <div class="form-group" id="customfields">
+            <label for="additor" class="title">Custom fields</label>
+            <a class="btn btn-light" id="additor">Add field</a>
+        </div>
+        <button class="btn btn-primary" id="post-submit"> Submit </button>
+    </div>
+
+    <div hidden class="row customfield mt-1" id="customfield">
+        <div class="col">
+            <select class="form-control" name="fieldType" required placeholder="Select type">
+                @foreach (var type in Model.Types)
+                {
+                    <option value="@type">@type</option>
+                }
+            </select>
+        </div>
+        <div class="col">
+            <input type="text" name="fieldName" class="form-control" placeholder="Field name">
+        </div>
+    </div>
+</div>
+<script>
+    $("#post-submit")[0].onclick = collectionCreateSubmit;
+    new Editor($("#description")[0], $("#markdown-prev")[0]);
+    $('#additor')[0].onclick = fieldCreator($('#customfield'), $('#customfields'));
+</script>

@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Collections.DAL.Entities.Identity;
+using NpgsqlTypes;
 
 namespace Collections.DAL.Entities
 {
@@ -7,7 +9,9 @@ namespace Collections.DAL.Entities
         public string Title { get; set; }
         public string Description { get; set; }
         public string Image { get; set; }
-        public List<CollectionItem> Items { get; set; }
-        public List<CustomField> Fields { get; set; }
+        public Theme Theme { get; set; }
+        public AppUser Owner { get; set; }
+        public List<Item> Items { get; set; } = new();
+        public List<Field> Fields { get; set; } = new();
     }
 }

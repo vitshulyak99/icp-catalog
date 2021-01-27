@@ -12,21 +12,19 @@ namespace Collections.DAL
     {
         
 
-        public static IServiceCollection AddAppDbContext(this IServiceCollection self, IWebHostEnvironment environment, IConfiguration configuration)
+        public static IServiceCollection AddAppDbContext(this IServiceCollection services, IWebHostEnvironment environment, IConfiguration configuration)
         {
             var connectionString = Develop.IsDeploy
                 ? Develop.HerokuConnectionString()
                 : configuration.GetConnectionString("Default");
-            self.AddDbContext<AppDbContext>(x => x.UseNpgsql(connectionString));
-            self.AddIdentity<AppUser, AppRole>()
+            services.AddDbContext<AppDbContext>(x => x.UseNpgsql(connectionString));
+            services.AddIdentity<AppUser, AppRole>()
                 .AddRoles<AppRole>()
-                .AddEntityFrameworkStores<AppDbContext>()
                 .AddSignInManager<SignInManager<AppUser>>()
                 .AddUserManager<UserManager<AppUser>>()
-                .AddRoleManager<RoleManager<AppRole>>()
-                .AddDefaultTokenProviders();
+                .AddEntityFrameworkStores<AppDbContext>();
 
-            return self;
+            return services;
         }
     }
 }

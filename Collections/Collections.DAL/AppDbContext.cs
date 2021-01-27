@@ -1,4 +1,5 @@
-﻿using Collections.DAL.Entities;
+﻿using System;
+using Collections.DAL.Entities;
 using Collections.DAL.Entities.Identity;
 using Collections.General;
 using Microsoft.AspNetCore.Identity;
@@ -7,14 +8,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Collections.DAL
 {
-    public class AppDbContext : IdentityDbContext<IdentityUser<int>, IdentityRole<int>, int>
+    public class AppDbContext : IdentityDbContext<AppUser, AppRole, int>
     {
         public DbSet<Collection> Collections { get; set; }
-        public DbSet<CollectionItem> CollectionItems { get; set; }
-        public DbSet<CollectionItemTag> ItemsTags { get; set; }
-        public DbSet<CustomField> CustomFields { get; set; }
-        public DbSet<CustomFieldValue> CustomFieldValues { get; set; }
+        public DbSet<Item> Items { get; set; }
+        public DbSet<Field> FieldDefs { get; set; }
+        public DbSet<FieldValue> FieldValues { get; set; }
         public DbSet<Tag> Tags { get; set; }
+        public DbSet<Theme> Themes { get; set; }
 
         public AppDbContext(DbContextOptions options) : base(options)
         {
@@ -23,84 +24,74 @@ namespace Collections.DAL
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            builder.Entity<Collection>(
+            builder.Entity<FieldValue>().ToTable("FieldValue")
+                   .HasIndex(x => new {x.Value})
+                   .IsTsVectorExpressionIndex("english")
+                   .HasMethod("GIN");
+
+            builder.Entity<Field>()
+                   .ToTable("FieldDef");
+
+            builder.Entity<Collection>().HasIndex(x => new {x.Title, x.Description})
+                   .IsTsVectorExpressionIndex("english")
+                   .HasMethod("GIN");
+
+            builder.Entity<Comment>()
+                   .HasIndex(x=>x.Text)
+                   .IsTsVectorExpressionIndex("english")
+                   .HasMethod("GIN");
+            builder.Entity<Item>()
+                   .HasIndex(x => new {ItemName = x.Name})
+                   .IsTsVectorExpressionIndex("english")
+                   .HasMethod("GIN");
+                   
+                                            
+
+            builder.Entity<AppUserRole>(
                 e =>
                 {
-                    e.HasMany(x => x.Fields)
-                        .WithOne(x => x.Collection)
-                        .HasForeignKey(x => x.CollectionId);
-                    e.HasMany(x => x.Items)
-                        .WithOne(x => x.Collection)
-                        .HasForeignKey(x => x.CollectionId);
-                });
-            builder.Entity<CollectionItem>(
-                e =>
-                {
-                    e.HasOne(x => x.Collection)
-                        .WithMany(x => x.Items)
-                        .HasForeignKey(x => x.CollectionId);
+                    e.HasOne(x => x.Role).WithMany().HasForeignKey(x => x.RoleId);
+                    e.HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserId);
                 });
 
-            builder.Entity<CollectionItemTag>(
+            builder.Entity<Theme>(
                 e =>
                 {
-                    e.HasKey(x => new { x.CollectionItemId, x.TagId });
-                    e.HasOne(x => x.Tag)
-                        .WithMany(x => x.ItemTags)
-                        .HasForeignKey(x => x.TagId);
-                    e.HasOne(x => x.CollectionItem)
-                        .WithMany(x => x.ItemsTags)
-                        .HasForeignKey(x => x.CollectionItemId);
+                    e.HasData(
+                        new Theme("Alcohol") { Id = 1 },
+                        new Theme("Cars") { Id = 2 },
+                        new Theme("Books") { Id = 3 },
+                        new Theme("Games") { Id = 4 });
                 });
-            builder.Entity<CustomField>(
-                e =>
-                {
-                    e.HasOne(x => x.Collection)
-                        .WithMany(x => x.Fields)
-                        .HasForeignKey(x => x.CollectionId);
-                });
-            builder.Entity<CustomFieldValue>(
-                e =>
-                {
-                    e.HasOne(x => x.CollectionItem)
-                        .WithMany(x => x.CustomFieldValues)
-                        .HasForeignKey(x => x.CollectionItemId);
-                    e.HasOne(x => x.CustomField)
-                        .WithMany(x => x.Values)
-                        .HasForeignKey(x => x.CustomFieldId);
-                });
-
             #region identity
 
             var passwordHasher = new PasswordHasher<AppUser>();
-            var adminRole = new AppRole(Constants.Roles.Admin) { Id = 1 };
+            var adminRole = new AppRole(Constants.Roles.Admin)
+            {
+                Id = 1,
+            };
             var customerRole = new AppRole(Constants.Roles.Customer) { Id = 2 };
             var adminUser = new AppUser(Constants.Roles.Admin)
             {
                 Id = 1,
                 Email = "admin@icp.cc",
                 NormalizedEmail = "admin@icp.cc",
+                UserName = "admin@icp.cc".ToUpper(),
+                NormalizedUserName = "admin@icp.cc".ToUpper(),
                 EmailConfirmed = true,
-                PasswordHash = passwordHasher.HashPassword(null, "!Admin123")
-            };
-            var customerUser = new AppUser(Constants.Roles.Customer)
-            {
-                Id = 2,
-                Email = "user@icp.cc",
-                NormalizedEmail = "user@icp.cc",
-                EmailConfirmed = true,
-                PasswordHash = passwordHasher.HashPassword(null, "!User123")
+                PasswordHash = passwordHasher.HashPassword(null, "!Pass123"),
+                SecurityStamp = Guid.NewGuid().ToString()
             };
 
             builder.Entity<AppRole>(
                 e =>
                 {
-                    e.HasData(adminRole, customerRole);
+                    e.HasData(adminRole);
                 });
             builder.Entity<AppUser>(
                 e =>
                 {
-                    e.HasData(adminUser, customerUser);
+                    e.HasData(adminUser);
                 });
             builder.Entity<IdentityUserRole<int>>(
                 e =>
@@ -110,15 +101,13 @@ namespace Collections.DAL
                         {
                             RoleId = adminRole.Id,
                             UserId = adminUser.Id
-                        },
-                        new IdentityUserRole<int>()
-                        {
-                            RoleId = customerRole.Id,
-                            UserId = customerUser.Id
                         });
                 });
 
             #endregion
+
+            builder.Entity<Tag>()
+                   .HasData(new Tag(1, "SomeTag"), new Tag(2, "SomeTag2"), new Tag(3, "Lamba"));
         }
     }
 }

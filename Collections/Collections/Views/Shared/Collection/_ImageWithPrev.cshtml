@@ -1,0 +1,16 @@
+﻿<div class="row">
+    <div class="col">
+        <div class="form-group">
+            <label for="imgFile" class="title">Image</label>
+            <input id="imgFile" type="file" class="form-control-file"/>
+        </div>
+    </div>
+    <div class="col">
+        <div class="figure-img">
+            <img id="img-preview" src="https://via.placeholder.com/150" alt="image"/>
+        </div>
+    </div>
+</div>
+<script>
+    $('#imgFile')[0].onchange = createImageUploadHandler($('#img-preview')[0])
+</script>

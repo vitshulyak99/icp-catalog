@@ -1,5 +1,4 @@
-﻿
-namespace Collections.DAL.Entities
+﻿namespace Collections.DAL.Entities
 {
     public abstract class BaseEntity<TKey>
     {

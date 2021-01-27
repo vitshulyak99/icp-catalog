@@ -5,9 +5,12 @@
     <UserSecretsId>f41bfa13-aa8c-48f3-b513-9abfc867a00e</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="10.1.1" />
+    <PackageReference Include="Markdig" Version="0.23.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="5.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="5.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.2" />
@@ -24,6 +27,18 @@
   <ItemGroup>
     <ProjectReference Include="..\Collections.DAL\Collections.DAL.csproj" />
     <ProjectReference Include="..\Collections.General\Collections.General.csproj" />
+    <ProjectReference Include="..\Services\Services.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\lib\jquery\dist\jquery.min.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Views\Item\" />
   </ItemGroup>
 
 </Project>

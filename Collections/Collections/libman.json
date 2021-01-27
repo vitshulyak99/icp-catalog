@@ -1,0 +1,67 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "markdown-it@12.0.4",
+      "destination": "wwwroot/lib/markdown-it/"
+    },
+    {
+      "library": "cloudinary-jquery-file-upload@2.11.3",
+      "destination": "wwwroot/lib/cloudinary-jquery-file-upload/",
+      "files": [
+        "cloudinary-jquery-file-upload.min.js"
+      ]
+    },
+    {
+      "library": "cloudinary-jquery@2.11.3",
+      "destination": "wwwroot/lib/cloudinary-jquery/",
+      "files": [
+        "cloudinary-jquery.min.js"
+      ]
+    },
+    {
+      "library": "jquery@3.5.1",
+      "destination": "wwwroot/lib/jquery/jquery/",
+      "files": [
+        "jquery.min.js"
+      ]
+    },
+    {
+      "library": "jqueryui@1.12.1",
+      "destination": "wwwroot/jqueryui/",
+      "files": [
+        "jquery-ui.min.js"
+      ]
+    },
+    {
+      "library": "blueimp-file-upload@10.31.0",
+      "destination": "wwwroot/blueimp-file-upload/",
+      "files": [
+        "js/jquery.fileupload.min.js",
+        "js/jquery.fileupload-ui.min.js",
+        "js/jquery.iframe-transport.min.js"
+      ]
+    },
+    {
+      "library": "axios@0.21.1",
+      "destination": "wwwroot/lib/axios/",
+      "files": [
+        "axios.min.js"
+      ]
+    },
+    {
+      "library": "tag-it@2.0",
+      "destination": "wwwroot/lib/tag-it/",
+      "files": [
+        "js/tag-it.min.js",
+        "js/tag-it.min.js.map",
+        "css/jquery.tagit.min.css"
+      ]
+    },
+    {
+      "library": "tagify@3.22.1",
+      "destination": "wwwroot/lib/tagify/"
+    }
+  ]
+}

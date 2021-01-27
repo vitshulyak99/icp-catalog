@@ -1,0 +1,55 @@
+﻿@model Collections.Models.Collection.CollectionDetailsModel
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+
+<div class="row">
+    <img src="@Model.Image" alt="Alternate Text" class="img-fluid" />
+</div>
+
+<div class="row">
+    @Model.Title
+</div>
+
+<div class="row">
+    <markdown class="text-center">@Model.Description</markdown>
+</div>
+
+<div class="row">
+    <span>@Model.Theme</span>
+</div>
+
+<div class="container">
+    <table>
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Tags</th>
+            @foreach (var field in Model.Items[0].Fields)
+            {
+                <th>@field.Name</th>
+            }
+        </tr>
+        </thead>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td class="d-flex">
+                    @foreach (var tag in item.Tags)
+                    {
+                        <div class="badge badge-info">@tag.Name</div>
+                    }
+                </td>
+                @foreach (var field in item.Fields)
+                {
+                    <td>
+                        @field.Value
+                    </td>
+                }
+            </tr>
+        }
+    </table>
+</div>
