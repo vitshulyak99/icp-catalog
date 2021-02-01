@@ -12,10 +12,11 @@ namespace Collections.DAL
     {
         public DbSet<Collection> Collections { get; set; }
         public DbSet<Item> Items { get; set; }
-        public DbSet<Field> FieldDefs { get; set; }
+        public DbSet<Field> Fields { get; set; }
         public DbSet<FieldValue> FieldValues { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Theme> Themes { get; set; }
+        public DbSet<Comment> Comments { get; set; }
 
         public AppDbContext(DbContextOptions options) : base(options)
         {
@@ -25,27 +26,25 @@ namespace Collections.DAL
         {
             base.OnModelCreating(builder);
             builder.Entity<FieldValue>().ToTable("FieldValue")
-                   .HasIndex(x => new {x.Value})
+                   .HasIndex(x => new { x.Value })
                    .IsTsVectorExpressionIndex("english")
                    .HasMethod("GIN");
 
             builder.Entity<Field>()
                    .ToTable("FieldDef");
 
-            builder.Entity<Collection>().HasIndex(x => new {x.Title, x.Description})
+            builder.Entity<Collection>().HasIndex(x => new { x.Title, x.Description })
                    .IsTsVectorExpressionIndex("english")
                    .HasMethod("GIN");
 
             builder.Entity<Comment>()
-                   .HasIndex(x=>x.Text)
+                   .HasIndex(x => x.Text)
                    .IsTsVectorExpressionIndex("english")
                    .HasMethod("GIN");
             builder.Entity<Item>()
-                   .HasIndex(x => new {ItemName = x.Name})
+                   .HasIndex(x => new { ItemName = x.Name })
                    .IsTsVectorExpressionIndex("english")
                    .HasMethod("GIN");
-                   
-                                            
 
             builder.Entity<AppUserRole>(
                 e =>
@@ -53,6 +52,13 @@ namespace Collections.DAL
                     e.HasOne(x => x.Role).WithMany().HasForeignKey(x => x.RoleId);
                     e.HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserId);
                 });
+
+            builder.Entity<Item>(e =>
+            {
+                e.HasMany(x => x.UserLike)
+                 .WithMany(x => x.LikedItems)
+                 .UsingEntity(x=>x.ToTable("LikedItems"));
+            });
 
             builder.Entity<Theme>(
                 e =>

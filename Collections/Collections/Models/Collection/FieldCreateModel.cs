@@ -1,4 +1,5 @@
-﻿using Collections.DAL.Entities.Enums;
+﻿using System.Text.Json.Serialization;
+using Collections.DAL.Entities.Enums;
 
 namespace Collections.Models.Collection
 {
@@ -9,7 +10,7 @@ namespace Collections.Models.Collection
         {
             
         }
-
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public FieldType Type { get; set; }
         public string Name { get; set; }
     }

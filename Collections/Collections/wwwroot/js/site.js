@@ -9,7 +9,7 @@ function checkUncheckAll(className) {
     }
 }
 
-function createImageUploadHandler(prev) {
+function createImageUploadHandler(prev, input) {
     return e => {
         const file = e.target.files[0];
         const formData = new FormData();
@@ -23,8 +23,9 @@ function createImageUploadHandler(prev) {
                 'Content-Type': "application/x-www-form-urlencoded"
             },
             data: formData
-        }).then(request => {
-            prev.src = request.data.url;
+        }).then(resp => {
+            prev.src = resp.data.url;
+            input.value = resp.data.url
         }).catch(console.log);
     }
 }
@@ -44,14 +45,17 @@ function Editor(input, preview) {
 
 function collectionCreateSubmit() {
     const createModel = {
-        image: $('#img-preview')[0].src,
         title: $('#title').val(),
+        image: $('#img-preview')[0].src,
+        theme: +$("#theme").val(),
         description: $('#description').val(),
-        theme: $("#theme").val(),
-        fields: Object.values($('#customfields')[0].fields)
+        Fields: Object.values($('#customfields')[0].fields),
+        ownerName: null
     }
     axios.post(CREATE_COLLECTION_POST_URL, createModel)
-        .catch(console.log);
+        .then(req => {
+            location.href = req.data.redirectionUrl
+        }).catch(console.log)
 }
 
 function fieldCreator(customField, container) {
@@ -77,21 +81,117 @@ function fieldCreator(customField, container) {
         select.update = () => fieldValue.type = select.value;
         select.update();
         select.onchange = e => select.update();
-        console.log(container[0].fields);
-        
         btn.onclick = () => {
             fields[field.id] = undefined;
-             clone.remove();
+            field.remove();
         }
         container[0].append(field);
         field.hidden = false;
-        
+
     }
 }
 
-function deleteCollection(id) {
-    return e => {
-        console.log(e);
-        axios.post(`${location.origin}/collection/delete/${id}`);
+function initItemCreateHandler() {
+    this.fields = {}
+    this.collectionId = -1
+    this.name = ''
+    this.tags = []
+    this.bindName = e => {
+        this.name = e.target.value
+    }
+    this.bindField = e => {
+        const id = e.target.id
+        const value = e.target.checked ? e.target.checked : e.target.value
+        if (!this.fields[id]) this.fields[id] = { fieldId: id }
+        this.fields[id] = value
+    }
+    this.bindTags = tags => this.tags = tags
+    this.getReqBody = () => ({
+        name: this.name,
+        tags: this.tags,
+        collectionId: this.collectionId,
+        fields: Object.keys(this.fields).map(x => ({ fieldId: x, value: this.fields[x] }))
+    })
+    this.post = () => {
+        const url = `${origin}/Item/CreatePost/${this.collectionId}`
+        axios.post(url, this.getReqBody())
+            .then(({ data }) => location.href = data.redirectionUrl)
     }
 }
+
+function tagifyInit(inputEl, tagOnChangeCallback) {
+
+    const tagify = new Tagify(inputEl, {
+        delimiters: null,
+        callbacks: {
+            add: onAddTag,
+            remove: onRemoveTag,
+            edit: onTagEdit,
+            input: onInput,
+            // invalid: onInvalidTag,
+            // click: onTagClick,
+            // focus: onTagifyFocusBlur,
+            // blur: onTagifyFocusBlur,
+            // 'dropdown:hide dropdown:show': e =>,
+            //'dropdown:select': onDropdownSelect
+        },
+        dropdown: {
+            classname: "color-blue",
+            enabled: 0,
+            maxItems: 5,
+            position: "text",
+            closeOnSelect: false,
+            highlightFirst: true
+        }
+    })
+    tagify.tagIds = {}
+
+
+    function getValue() {
+        return tagify.value.map(({ value }) => ({ id: tagify.tagIds[value], name: value }))
+    }
+
+    function onAddTag(e) {
+        const values = getValue()
+        tagOnChangeCallback(values)
+    }
+
+    function onRemoveTag(e) {
+        const values = getValue()
+        tagOnChangeCallback(values)
+    }
+    tagify.reqCancelSource = {
+        cancel: () => {}
+    }
+
+    function onInput(e) {
+
+        tagify.settings.whitelist.length = 0;
+        tagify.loading(true)
+        tagify.reqCancelSource.cancel()
+        tagify.reqCancelSource = axios.CancelToken.source();
+        axios.get(`${origin}/api/tag/like/${e.detail.value}`, { cancelToken: tagify.reqCancelSource.token }).then(result => {
+
+            const sTags = result.data;
+            sTags.forEach(({ id, name }) => tagify.tagIds[name] = id)
+            const values = sTags.map(({ name }) => name)
+            tagify.settings.whitelist = values
+            tagify
+                .loading(false)
+                .dropdown.show.call(tagify);
+        }).catch(e => tagify.loading(false))
+    }
+
+    function onTagEdit(e) {
+        const values = getValue()
+        tagOnChangeCallback(values)
+    }
+
+    return tagify
+}
+
+const likeEventHandlerCreator = (img,counter) =>  e => axios.get(origin + '/item/set').then(res=>{
+    img.src = res.data ? "heart.png" : "heart-clicked.png"
+    const c = Number.parseInt(counter.innerHTML)
+    counter.innerHTML =  res.data ? c++ : c--
+})

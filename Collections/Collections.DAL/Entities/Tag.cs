@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using NpgsqlTypes;
 
 namespace Collections.DAL.Entities
 {
@@ -14,6 +13,13 @@ namespace Collections.DAL.Entities
             Id = id;
             Name = tagName;
         }
+
+        public sealed override int Id
+        {
+            get => base.Id;
+            set => base.Id = value;
+        }
+
         public string Name { get; set; }
         public List<Item> ItemTags { get; set; } = new();
     }

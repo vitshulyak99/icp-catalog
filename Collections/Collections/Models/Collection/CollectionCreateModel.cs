@@ -1,8 +1,18 @@
-﻿namespace Collections.Models.Collection
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Collections.Models.Collection
 {
-    public class CollectionCreateModel : CollectionModel
+    public class CollectionCreateModel 
     {
-        public FieldCreateModel[] Fields { get; set; }
-        public string OwnerName { get; set; }
+        [Required]
+        public string Title { get; set; }
+        [Required]
+        public string Image { get; set; }
+        [Required]
+        public int Theme { get; set; }
+        [Required]
+        public string Description { get; set; }
+
+        public FieldCreateModel[] Fields { get; set; } = new FieldCreateModel[0];
     }
 }

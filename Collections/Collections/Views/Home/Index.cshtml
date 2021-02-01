@@ -1,10 +1,68 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@using Collections.Extensions
+@using Collections.Models.Item
+@model Collections.Models.HomeIndexViewModel
 @{
-   Layout = "_Layout";
+    Layout = "_Layout";
 }
 
-<div>
-    List
+
+<div class="row">
+    <div class="col-2">
+        <div class="d-flex flex-wrap">
+            <b>Collection:</b>
+            @foreach (var tag in Model.Tags)
+            {
+                <a id="@tag.Id" class="tag badge @TagModel.RandomBadgeStyleClass p-1 ml-1 mb-1">@tag.Name</a>
+            }
+        </div>
+    </div>
+
+    <div class="col">
+        <div>
+            <div id="lastItems">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <td>Name</td>
+                            <td>Tags</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.LastItems)
+                        {
+                            <tr>
+                                <td> @item.Name</td>
+                                <td>
+                                    @foreach (var tag in item.Tags)
+                                    {
+                                        <a id="@tag.Id" class="tag badge @(TagModel.RandomBadgeStyleClass) p-1 ml-1 mb-1">@tag.Name</a>
+                                    }
+                                </td>
+                                <td>
+                                    <partial name="_LikeBadge" model="(item.Likes.Contains(User.GetNameIdentifier()),item.Likes.Count)" />
+                                </td>
+                                <td>
+                                    <a asp-action="Details" asp-controller="Item" asp-route-id="@item.Id">More >></a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div id="top-10-collections">
+                <h3>Top 10 collections by number of items</h3>
+                <div class="d-flex flex-wrap">
+                    @foreach (var c in Model.TopCollections)
+                    {
+                        <partial name="Collection/_CollectionSimpleCard" model="c" />
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+</script>

@@ -1,10 +1,8 @@
-﻿using NpgsqlTypes;
-
-namespace Collections.DAL.Entities
+﻿namespace Collections.DAL.Entities
 {
-    public class FieldValue : Field
+    public class FieldValue : BaseEntity
     {
-        public int FieldId { get; set; }
+        public Field Field { get; set; }
         public string Value { get; set; }
         public Item Item { get; set; }
     }

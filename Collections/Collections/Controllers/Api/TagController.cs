@@ -1,12 +1,9 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using Collections.DAL;
-using Collections.DAL.Expressions;
 using Collections.Models.Item;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Services.Abstractions.Interfaces;
 
 namespace Collections.Controllers.Api
 {
@@ -14,23 +11,22 @@ namespace Collections.Controllers.Api
     [Route("api/[controller]")]
     public class TagController : ControllerBase
     {
-        private readonly AppDbContext _db;
+        private readonly ITagService _tagService;
         private readonly IMapper _mapper;
-        public TagController(AppDbContext db, IMapper mapper)
+        public TagController(IMapper mapper, ITagService tagService)
         {
-            _db = db;
             _mapper = mapper;
+            _tagService = tagService;
         }
 
         // GET
-        [HttpGet]
+        [HttpGet("[action]/{like?}")]
         [AllowAnonymous]
-        public IActionResult Like([FromQuery] string like)
+        public IActionResult Like(string like)
         {
-            var tags = _db.Tags
-                         //.FullText(like)
-                         .Where(x=>x.Name.ToLower().StartsWith(like.ToLower())).ProjectTo<TagModel>(_mapper.ConfigurationProvider).ToArray();
-           return Ok(tags);
+            var tags = _tagService.GetLike(like).Select(_mapper.Map<TagModel>);
+            return Ok(tags);
         }
     }
+
 }

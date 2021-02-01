@@ -540,7 +540,7 @@ namespace Collections.DAL.Migrations
             modelBuilder.Entity("Collections.DAL.Entities.Identity.AppUser", b =>
                 {
                     b.HasOne("Collections.DAL.Entities.Item", null)
-                        .WithMany("Likes")
+                        .WithMany("LikedItems")
                         .HasForeignKey("ItemId");
                 });
 
@@ -673,7 +673,7 @@ namespace Collections.DAL.Migrations
 
                     b.Navigation("Fields");
 
-                    b.Navigation("Likes");
+                    b.Navigation("LikedItems");
                 });
 
             modelBuilder.Entity("Collections.DAL.Entities.Theme", b =>

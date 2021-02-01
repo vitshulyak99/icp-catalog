@@ -7,7 +7,6 @@
         MultilineText,
         Boolean,
         Date,
-        SingleImage,
-        Gallery
+        DateTime
     }
 }

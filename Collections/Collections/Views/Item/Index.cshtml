@@ -1,0 +1,33 @@
+﻿@model System.Collections.Generic.List<Collections.Models.Item.ItemSearchResultViewModel>
+
+@{
+    ViewBag.Title = "SearchResult";
+    Layout = "_Layout";
+}
+
+@foreach (var byCollection in @Model.GroupBy(x => x.Collection))
+{
+
+    <div class="m-1">
+        <a asp-action="Details" asp-controller="Collection" asp-route-id="@byCollection.Key.Id">@byCollection.Key.Title</a>
+    
+        <div class="p-2">
+            <table class="table">
+                <thead>
+                <tr class="row">
+                    <th class="col-1">Id</th>
+                    <th class="col-3">Name</th>
+                    <th class="col-2">Tags</th>
+                    @foreach (var field in byCollection.Key.Fields)
+                    {
+                        <th class="col">@field.Name</th>
+                    }
+                </tr>
+                </thead>
+                <tbody id="collection-items">
+                    <partial name="Item/_CollectionItemsTBody" model="byCollection"/>
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

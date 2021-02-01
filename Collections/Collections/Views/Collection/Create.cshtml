@@ -11,22 +11,16 @@
         </div>
         <div class="form-group">
             <label class="title" for="theme"> Theme </label>
-            <select name="theme" class="form-control" id="theme">
-                @foreach (var theme in Model.Themes)
+            <select name="themeService" class="form-control" id="theme">
+                <option selected="@true" value="@Model.Themes[0].Id"> @Model.Themes[0].Name </option>
+                @foreach (var theme in Model.Themes.ToArray()[1..])
                 {
                     <option value="@theme.Id"> @theme.Name </option>
                 }
             </select>
         </div>
-        <partial name="Collection/_ImageWithPrev" />
-        <div class="form-group">
-            <label for="description">Description</label>
-            <textarea id="description" class="form-control" style="height:100px" name="description" oninput="this.editor.update()" placeholder="Type description. MarkdownTagHelper supported"></textarea>
-        </div>
-        <div class="form-group">
-            <label class="title" for="markdown-prev">Preview</label>
-            <div class="form-control pre-scrollable" style="height:100px" id="markdown-prev"></div>
-        </div>
+        <partial name="Collection/_ImageWithPrev" model="string.Empty" />
+        <partial name="_DescriptionMarkdownInput" model="string.Empty"/>
         <div class="form-group" id="customfields">
             <label for="additor" class="title">Custom fields</label>
             <a class="btn btn-light" id="additor">Add field</a>
@@ -50,6 +44,5 @@
 </div>
 <script>
     $("#post-submit")[0].onclick = collectionCreateSubmit;
-    new Editor($("#description")[0], $("#markdown-prev")[0]);
     $('#additor')[0].onclick = fieldCreator($('#customfield'), $('#customfields'));
 </script>

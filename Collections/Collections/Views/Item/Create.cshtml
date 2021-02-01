@@ -1,0 +1,62 @@
+﻿@using Collections.DAL.Entities.Enums
+@model Collections.Models.Item.ItemCreateViewModel
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+
+
+<div>
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input id="name" asp-for="Name" class="form-control" />
+    </div>
+    <div>
+        <label asp-for="Tags"></label>
+        <input name="tags" class="form-control" placeholder="input some tags" />
+    </div>
+    @foreach (var field in Model.Fields)
+    {
+        <div class="form-group">
+            <label for="@field.Name">@field.Name</label>
+            @if (field.Type == FieldType.Text)
+            {
+                <input id="@field.Id" type="text" class="form-control cf" name="@field.Name"/>
+            }
+            else if (field.Type == FieldType.MultilineText)
+            {
+                <textarea id="@field.Id" class="form-control cf" name="@field.Name"></textarea>
+            }
+            else if (field.Type == FieldType.Boolean)
+            {
+                <input id="@field.Id" type="checkbox" class="form-control cf" name="@field.Name" />
+            }
+            else if (field.Type == FieldType.Date)
+            {
+                <input id="@field.Id" type="date" class="form-control cf" name="@field.Name" />
+            }
+            else if (field.Type == FieldType.DateTime)
+            {
+                <input id="@field.Id" type="datetime" class="form-control cf" name="@field.Name" />
+            }
+            else if (field.Type == FieldType.Number)
+            {
+                <input id="@field.Id" type="number" class="form-control cf" name="@field.Name" />
+            }
+        </div>
+    }
+    <button id="post-submit" class="btn btn-primary">Submit</button>
+    <script>
+        $(document).ready(() => {
+            window.itemCreator = new initItemCreateHandler();
+            tagifyInit($('[name=tags]')[0], itemCreator.bindTags);
+            $('#name')[0].oninput = itemCreator.bindName;
+            itemCreator.collectionId = @Model.CollectionId;
+            $('.cf').toArray().forEach(x => {
+                x.oninput = itemCreator.bindField;
+            });
+            $('#post-submit')[0].onclick = itemCreator.post;
+        })
+    </script>
+</div>

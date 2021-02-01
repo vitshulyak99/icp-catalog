@@ -17,15 +17,17 @@ namespace Collections
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration, IWebHostEnvironment webHostEnvironment){
+        public Startup(IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
+        {
             Configuration = configuration;
             WebHostEnvironment = webHostEnvironment;
         }
 
         public IConfiguration Configuration { get; }
         public IWebHostEnvironment WebHostEnvironment { get; }
-        public void ConfigureServices(IServiceCollection services){
-            services.AddAppDbContext(WebHostEnvironment,Configuration);
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddAppDbContext(WebHostEnvironment, Configuration);
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                     .AddCookie()
                     .AddGoogle(
@@ -62,11 +64,8 @@ namespace Collections
             });
             mapperConfiguration.AssertConfigurationIsValid();
             var mapper = mapperConfiguration.CreateMapper();
-            services.AddSingleton(mapper);
-            var pipline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
-            services.AddSingleton(pipline);
-            services.AddServices();
-           
+            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+            services.AddSingleton(pipeline).AddSingleton(mapper).AddServices();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

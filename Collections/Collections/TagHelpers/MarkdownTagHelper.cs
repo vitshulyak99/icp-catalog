@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Markdig;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -12,7 +13,7 @@ namespace Collections.TagHelpers
 
         [HtmlAttributeName("markdown")] public ModelExpression Markdown { get; set; }
 
-        // [HtmlAttributeName("max-lines")] public int? MaxLines { get; set; } = null;
+        [HtmlAttributeName("max-length")] public int? MaxLength { get; set; } = null;
 
         [HtmlAttributeName("class")] public string Class { get; set; }
 
@@ -40,7 +41,7 @@ namespace Collections.TagHelpers
 
             
             var b = content.Trim().Trim('\n', '\r').TrimEnd().TrimStart();
-            var html = Markdig.Markdown.ToHtml(b,_pipeline);
+            var html = Markdig.Markdown.ToHtml(MaxLength.HasValue && MaxLength.Value < b.Length ? b.Substring(0,MaxLength.Value): b,_pipeline);
             output.Content.SetHtmlContent(html);
         }
     }

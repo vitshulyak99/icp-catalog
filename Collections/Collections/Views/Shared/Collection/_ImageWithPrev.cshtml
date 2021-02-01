@@ -1,16 +1,20 @@
-﻿<div class="row">
+﻿@model string
+
+<div class="row">
     <div class="col">
         <div class="form-group">
+            <input type="text" name="image" value="@Model" hidden />
             <label for="imgFile" class="title">Image</label>
             <input id="imgFile" type="file" class="form-control-file"/>
         </div>
     </div>
     <div class="col">
         <div class="figure-img">
-            <img id="img-preview" src="https://via.placeholder.com/150" alt="image"/>
+            <input type="text" name="image" value="@Model" hidden />
+            <img id="img-preview" src='@(string.IsNullOrEmpty(Model) ? "https://via.placeholder.com/150" : Model)' alt="@(string.IsNullOrEmpty( Model) ? "placeholder" : Model)"/>
         </div>
     </div>
 </div>
 <script>
-    $('#imgFile')[0].onchange = createImageUploadHandler($('#img-preview')[0])
+    $('#imgFile')[0].onchange = createImageUploadHandler($('#img-preview')[0],$('input[name=image]')[0])
 </script>
