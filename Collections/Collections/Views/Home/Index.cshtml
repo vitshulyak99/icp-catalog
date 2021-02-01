@@ -8,28 +8,34 @@
 
 <div class="row">
     <div class="col-2">
-        <div class="d-flex flex-wrap">
-            <b>Collection:</b>
-            @foreach (var tag in Model.Tags)
-            {
-                <a id="@tag.Id" class="tag badge @TagModel.RandomBadgeStyleClass p-1 ml-1 mb-1">@tag.Name</a>
-            }
-        </div>
+        <b>Tags: </b>
+            <p class="d-flex flex-wrap">
+                @foreach (var tag in Model.Tags)
+                {
+                    <a id="@tag.Id" class="tag badge @TagModel.RandomBadgeStyleClass p-1 ml-1 mb-1">@tag.Name</a>
+                }
+            </p>
     </div>
 
     <div class="col">
         <div>
             <div id="lastItems">
-                <table class="table">
-                    <thead>
+                @if (@Model.LastItems.Length < 1)
+                {
+                    <p>No last items</p>
+                }
+                else
+                {
+                    <table class="table">
+                        <thead>
                         <tr>
                             <td>Name</td>
                             <td>Tags</td>
                             <td></td>
                             <td></td>
                         </tr>
-                    </thead>
-                    <tbody>
+                        </thead>
+                        <tbody>
                         @foreach (var item in Model.LastItems)
                         {
                             <tr>
@@ -48,17 +54,27 @@
                                 </td>
                             </tr>
                         }
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                }
             </div>
             <div id="top-10-collections">
                 <h3>Top 10 collections by number of items</h3>
-                <div class="d-flex flex-wrap">
-                    @foreach (var c in Model.TopCollections)
-                    {
-                        <partial name="Collection/_CollectionSimpleCard" model="c" />
-                    }
-                </div>
+                @if (Model.TopCollections.Length < 1)
+                {
+                    <p>
+                        No Collections
+                    </p>
+                }
+                else
+                {
+                    <div class="d-flex flex-wrap">
+                        @foreach (var c in Model.TopCollections)
+                        {
+                            <partial name="Collection/_CollectionSimpleCard" model="c" />
+                        }
+                    </div>
+                }
             </div>
         </div>
     </div>
