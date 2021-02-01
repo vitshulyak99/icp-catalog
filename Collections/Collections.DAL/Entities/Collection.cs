@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Collections.DAL.Entities.Identity;
-using NpgsqlTypes;
 
 namespace Collections.DAL.Entities
 {

@@ -16,6 +16,5 @@ namespace Collections.DAL.Expressions
             self.Where(x => EF.Functions.ToTsVector("english", x.Value).Matches(like));
         public static IQueryable<Comment> FullText(this IQueryable<Comment> self, string like) =>
             self.Where(x => EF.Functions.ToTsVector("english", x.Text).Matches(like));
-
     }
 } 
