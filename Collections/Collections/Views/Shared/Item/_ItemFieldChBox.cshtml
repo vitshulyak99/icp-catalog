@@ -1,6 +1,0 @@
-﻿@model Collections.Models.Item.FieldValueViewModel
-
-<div class="form-group col-2 m-2">
-    <label for="@Model.Field.Name" class="font-weight-bold">@Model.Field.Name</label>
-    <input disabled type="checkbox" class="checkbox" name="@Model.Field.Name" value="" @(bool.TryParse(Model.Value, out var v) ? "checked" : string.Empty) />
-</div>
