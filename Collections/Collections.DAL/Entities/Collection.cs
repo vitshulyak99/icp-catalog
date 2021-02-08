@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Collections.DAL.Entities.Identity;
+using NpgsqlTypes;
 
 namespace Collections.DAL.Entities
 {
@@ -12,5 +13,6 @@ namespace Collections.DAL.Entities
         public AppUser Owner { get; set; }
         public List<Item> Items { get; set; } = new();
         public List<Field> Fields { get; set; } = new();
+        public NpgsqlTsVector SearchVector { get; set; }
     }
 }

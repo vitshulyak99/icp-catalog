@@ -3,22 +3,38 @@ using System;
 using Collections.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using NpgsqlTypes;
 
 namespace Collections.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210131140126_Likes")]
+    partial class Likes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .UseIdentityByDefaultColumns()
                 .HasAnnotation("Relational:MaxIdentifierLength", 63)
                 .HasAnnotation("ProductVersion", "5.0.2");
+
+            modelBuilder.Entity("AppUserItem", b =>
+                {
+                    b.Property<int>("LikedItemsId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserLikeId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("LikedItemsId", "UserLikeId");
+
+                    b.HasIndex("UserLikeId");
+
+                    b.ToTable("LikedItems");
+                });
 
             modelBuilder.Entity("Collections.DAL.Entities.Collection", b =>
                 {
@@ -36,12 +52,6 @@ namespace Collections.DAL.Migrations
                     b.Property<int?>("OwnerId")
                         .HasColumnType("integer");
 
-                    b.Property<NpgsqlTsVector>("SearchVector")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("tsvector")
-                        .HasAnnotation("Npgsql:TsVectorConfig", "english")
-                        .HasAnnotation("Npgsql:TsVectorProperties", new[] { "Description", "Title" });
-
                     b.Property<int?>("ThemeId")
                         .HasColumnType("integer");
 
@@ -52,10 +62,11 @@ namespace Collections.DAL.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.HasIndex("SearchVector")
-                        .HasMethod("GIN");
-
                     b.HasIndex("ThemeId");
+
+                    b.HasIndex("Title", "Description")
+                        .HasMethod("GIN")
+                        .HasAnnotation("Npgsql:TsVectorConfig", "english");
 
                     b.ToTable("Collections");
                 });
@@ -73,12 +84,6 @@ namespace Collections.DAL.Migrations
                     b.Property<int?>("ItemId")
                         .HasColumnType("integer");
 
-                    b.Property<NpgsqlTsVector>("SearchVector")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("tsvector")
-                        .HasAnnotation("Npgsql:TsVectorConfig", "english")
-                        .HasAnnotation("Npgsql:TsVectorProperties", new[] { "Text" });
-
                     b.Property<int?>("SenderId")
                         .HasColumnType("integer");
 
@@ -89,10 +94,11 @@ namespace Collections.DAL.Migrations
 
                     b.HasIndex("ItemId");
 
-                    b.HasIndex("SearchVector")
-                        .HasMethod("GIN");
-
                     b.HasIndex("SenderId");
+
+                    b.HasIndex("Text")
+                        .HasMethod("GIN")
+                        .HasAnnotation("Npgsql:TsVectorConfig", "english");
 
                     b.ToTable("Comments");
                 });
@@ -109,9 +115,6 @@ namespace Collections.DAL.Migrations
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
-
-                    b.Property<NpgsqlTsVector>("SearchVector")
-                        .HasColumnType("tsvector");
 
                     b.Property<int>("Type")
                         .HasColumnType("integer");
@@ -136,12 +139,6 @@ namespace Collections.DAL.Migrations
                     b.Property<int?>("ItemId")
                         .HasColumnType("integer");
 
-                    b.Property<NpgsqlTsVector>("SearchVector")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("tsvector")
-                        .HasAnnotation("Npgsql:TsVectorConfig", "english")
-                        .HasAnnotation("Npgsql:TsVectorProperties", new[] { "Value" });
-
                     b.Property<string>("Value")
                         .HasColumnType("text");
 
@@ -151,10 +148,11 @@ namespace Collections.DAL.Migrations
 
                     b.HasIndex("ItemId");
 
-                    b.HasIndex("SearchVector")
-                        .HasMethod("GIN");
+                    b.HasIndex("Value")
+                        .HasMethod("GIN")
+                        .HasAnnotation("Npgsql:TsVectorConfig", "english");
 
-                    b.ToTable("FieldValues");
+                    b.ToTable("FieldValue");
                 });
 
             modelBuilder.Entity("Collections.DAL.Entities.Identity.AppRole", b =>
@@ -188,7 +186,7 @@ namespace Collections.DAL.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "f11e3dc9-4768-4794-9f9d-e76a3ab636d9",
+                            ConcurrencyStamp = "09b34519-29fa-486e-a56c-3549e619f1e0",
                             Name = "admin",
                             NormalizedName = "ADMIN"
                         });
@@ -264,15 +262,15 @@ namespace Collections.DAL.Migrations
                         {
                             Id = 1,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "691b44f9-20d4-4637-980f-9709f8e5691c",
+                            ConcurrencyStamp = "63501b9e-c2fd-4c54-80b2-4ff5e07d60c9",
                             Email = "admin@icp.cc",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "admin@icp.cc",
                             NormalizedUserName = "ADMIN@ICP.CC",
-                            PasswordHash = "AQAAAAEAACcQAAAAEFdE5fXK8m2vyzX7MMiPhWURlEK/0CespCk+2yoqyNFTbKRGLFs20sCLPXPydqOICQ==",
+                            PasswordHash = "AQAAAAEAACcQAAAAECn17+0UpnoolZpYfp64oP2fPvBJVSKCM+2oKyH3VbeaPXgmYqIQjq6my60dPXDucA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "18eac5a1-d8a4-4e60-98fc-cc8b4c522401",
+                            SecurityStamp = "8be16886-2315-4448-8619-e3115dc3850b",
                             TwoFactorEnabled = false,
                             UserName = "ADMIN@ICP.CC"
                         });
@@ -291,35 +289,15 @@ namespace Collections.DAL.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
-                    b.Property<NpgsqlTsVector>("SearchVector")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("tsvector")
-                        .HasAnnotation("Npgsql:TsVectorConfig", "english")
-                        .HasAnnotation("Npgsql:TsVectorProperties", new[] { "Name" });
-
                     b.HasKey("Id");
 
                     b.HasIndex("CollectionId");
 
-                    b.HasIndex("SearchVector")
-                        .HasMethod("GIN");
+                    b.HasIndex("Name")
+                        .HasMethod("GIN")
+                        .HasAnnotation("Npgsql:TsVectorConfig", "english");
 
                     b.ToTable("Items");
-                });
-
-            modelBuilder.Entity("Collections.DAL.Entities.Like", b =>
-                {
-                    b.Property<int>("ItemId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("ItemId", "UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Likes");
                 });
 
             modelBuilder.Entity("Collections.DAL.Entities.Tag", b =>
@@ -537,6 +515,21 @@ namespace Collections.DAL.Migrations
                     b.HasDiscriminator().HasValue("AppUserRole");
                 });
 
+            modelBuilder.Entity("AppUserItem", b =>
+                {
+                    b.HasOne("Collections.DAL.Entities.Item", null)
+                        .WithMany()
+                        .HasForeignKey("LikedItemsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Collections.DAL.Entities.Identity.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserLikeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Collections.DAL.Entities.Collection", b =>
                 {
                     b.HasOne("Collections.DAL.Entities.Identity.AppUser", "Owner")
@@ -598,25 +591,6 @@ namespace Collections.DAL.Migrations
                         .HasForeignKey("CollectionId");
 
                     b.Navigation("Collection");
-                });
-
-            modelBuilder.Entity("Collections.DAL.Entities.Like", b =>
-                {
-                    b.HasOne("Collections.DAL.Entities.Item", "Item")
-                        .WithMany("Likes")
-                        .HasForeignKey("ItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Collections.DAL.Entities.Identity.AppUser", "User")
-                        .WithMany("Likes")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Item");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ItemTag", b =>
@@ -720,8 +694,6 @@ namespace Collections.DAL.Migrations
 
                     b.Navigation("Comments");
 
-                    b.Navigation("Likes");
-
                     b.Navigation("UserRoles");
                 });
 
@@ -730,8 +702,6 @@ namespace Collections.DAL.Migrations
                     b.Navigation("Comments");
 
                     b.Navigation("Fields");
-
-                    b.Navigation("Likes");
                 });
 
             modelBuilder.Entity("Collections.DAL.Entities.Theme", b =>

@@ -12,7 +12,7 @@ namespace Collections.DAL
     {
         
 
-        public static IServiceCollection AddAppDbContext(this IServiceCollection services, IWebHostEnvironment environment, IConfiguration configuration)
+        public static IServiceCollection AddAppDbContext(this IServiceCollection services, IConfiguration configuration)
         {
             var connectionString = Develop.IsDeploy
                 ? Develop.HerokuConnectionString()

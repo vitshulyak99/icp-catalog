@@ -17,6 +17,6 @@ namespace Collections.DAL.Entities.Identity
         public List<Comment> Comments { get; set; } = new();
         public List<Collection> Collections { get; set; } = new();
         public List<AppUserRole> UserRoles { get; set; } = new();
-        public List<Item> LikedItems { get; set; } = new();
+        public List<Like> Likes { get; set; } = new();
     }
 }

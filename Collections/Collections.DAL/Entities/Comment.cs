@@ -1,5 +1,6 @@
 ﻿using System;
 using Collections.DAL.Entities.Identity;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using NpgsqlTypes;
 
 namespace Collections.DAL.Entities
@@ -10,5 +11,7 @@ namespace Collections.DAL.Entities
         public string Text { get; set; }
         public AppUser Sender { get; set; }
         public Item Item { get; set; }
+
+        public NpgsqlTsVector SearchVector { get; set; }
     }
 }

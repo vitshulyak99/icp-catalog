@@ -16,6 +16,7 @@ namespace Collections.DAL
         public DbSet<FieldValue> FieldValues { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Theme> Themes { get; set; }
+        public DbSet<Like> Likes { get; set; }
         public DbSet<Comment> Comments { get; set; }
 
         public AppDbContext(DbContextOptions options) : base(options)
@@ -25,25 +26,27 @@ namespace Collections.DAL
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            builder.Entity<FieldValue>().ToTable("FieldValue")
-                   .HasIndex(x => new { x.Value })
-                   .IsTsVectorExpressionIndex("english")
+            builder.Entity<Like>(e => e.HasKey(x => new {x.ItemId, x.UserId}));
+            builder.Entity<FieldValue>()
+                   .HasGeneratedTsVectorColumn(x => x.SearchVector, "english", x => x.Value)
+                   .HasIndex(x => x.SearchVector)
                    .HasMethod("GIN");
 
             builder.Entity<Field>()
                    .ToTable("FieldDef");
 
-            builder.Entity<Collection>().HasIndex(x => new { x.Title, x.Description })
-                   .IsTsVectorExpressionIndex("english")
+            builder.Entity<Collection>()
+                   .HasGeneratedTsVectorColumn(x => x.SearchVector, "english", x => new {x.Description, x.Title})
+                   .HasIndex(x => x.SearchVector)
                    .HasMethod("GIN");
 
             builder.Entity<Comment>()
-                   .HasIndex(x => x.Text)
-                   .IsTsVectorExpressionIndex("english")
+                   .HasGeneratedTsVectorColumn(x => x.SearchVector, "english", x => x.Text)
+                   .HasIndex(x => x.SearchVector)
                    .HasMethod("GIN");
             builder.Entity<Item>()
-                   .HasIndex(x => new { ItemName = x.Name })
-                   .IsTsVectorExpressionIndex("english")
+                   .HasGeneratedTsVectorColumn(x => x.SearchVector, "english", x => x.Name)
+                   .HasIndex(x => x.SearchVector)
                    .HasMethod("GIN");
 
             builder.Entity<AppUserRole>(
@@ -55,20 +58,28 @@ namespace Collections.DAL
 
             builder.Entity<Item>(e =>
             {
-                e.HasMany(x => x.UserLike)
-                 .WithMany(x => x.LikedItems)
-                 .UsingEntity(x=>x.ToTable("LikedItems"));
+                e.HasMany(x => x.Likes)
+                 .WithOne(x => x.Item)
+                 .HasForeignKey(x => x.ItemId);
+            });
+
+            builder.Entity<AppUser>(e =>
+            {
+                e.HasMany(x => x.Likes)
+                 .WithOne(x => x.User)
+                 .HasForeignKey(x => x.UserId);
             });
 
             builder.Entity<Theme>(
                 e =>
                 {
                     e.HasData(
-                        new Theme("Alcohol") { Id = 1 },
-                        new Theme("Cars") { Id = 2 },
-                        new Theme("Books") { Id = 3 },
-                        new Theme("Games") { Id = 4 });
+                        new Theme("Alcohol") {Id = 1},
+                        new Theme("Cars") {Id = 2},
+                        new Theme("Books") {Id = 3},
+                        new Theme("Games") {Id = 4});
                 });
+
             #region identity
 
             var passwordHasher = new PasswordHasher<AppUser>();
@@ -76,7 +87,7 @@ namespace Collections.DAL
             {
                 Id = 1,
             };
-            var customerRole = new AppRole(Constants.Roles.Customer) { Id = 2 };
+            var customerRole = new AppRole(Constants.Roles.Customer) {Id = 2};
             var adminUser = new AppUser(Constants.Roles.Admin)
             {
                 Id = 1,
@@ -90,15 +101,9 @@ namespace Collections.DAL
             };
 
             builder.Entity<AppRole>(
-                e =>
-                {
-                    e.HasData(adminRole);
-                });
+                e => { e.HasData(adminRole); });
             builder.Entity<AppUser>(
-                e =>
-                {
-                    e.HasData(adminUser);
-                });
+                e => { e.HasData(adminUser); });
             builder.Entity<IdentityUserRole<int>>(
                 e =>
                 {
