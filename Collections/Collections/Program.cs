@@ -1,7 +1,6 @@
 using System;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Collections.General;
 
 namespace Collections
 {
@@ -18,11 +17,5 @@ namespace Collections
             WebHost.CreateDefaultBuilder(args)
                 .UseHerokuUrls()
                 .UseStartup<Startup>();
-    }
-
-    public static class WebHostBuilderExtension
-    {
-        public static IWebHostBuilder UseHerokuUrls(this IWebHostBuilder webHostBuilder) 
-            => Develop.IsDeploy ? webHostBuilder.UseUrls($"http://*:{Program.Port}") : webHostBuilder;
     }
 }

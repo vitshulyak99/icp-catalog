@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
-using Collections.DAL.Entities;
+using Services.DTO;
 
 namespace Services.Abstractions.Interfaces
 {
-    public interface ICollectionService : ICrudService<Collection>, IPermission
+    public interface ICollectionService : ICrudService<CollectionDto>, IPermission
     {
-        IEnumerable<Field> GetFields(int collectionId);
-        IEnumerable<Collection> ByUser(int UserId);
+        IEnumerable<FieldDto> GetFields(int id);
+        IEnumerable<CollectionDto> ByUser(int userId);
     }
 }

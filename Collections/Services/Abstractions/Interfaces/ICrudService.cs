@@ -1,17 +1,14 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
-using Collections.DAL.Entities;
+﻿using System.Collections.Generic;
 
 namespace Services.Abstractions.Interfaces
 {
-    public interface ICrudService<T> where T: BaseEntity
+    public interface ICrudService<TDto>
     {
-        IQueryable<T> Get();
-        T GetById(int id);
-        T Create(T entity);
-        T Update(T entity);
+        IEnumerable<TDto> GetPage(int skip = 0, int take = -1);
+        IEnumerable<TDto> GetAll();
+        TDto GetById(int id);
+        TDto Create(TDto dto);
+        TDto Update(TDto dto);
         void Delete(params int[] ids);
-        void Delete(Expression<Func<T, bool>> predicate);
     }
 }

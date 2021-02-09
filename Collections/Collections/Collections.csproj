@@ -10,18 +10,19 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.1.1" />
-    <PackageReference Include="Markdig" Version="0.23.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="5.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="5.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,6 +36,47 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\Collection\Create.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Collection\Details.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Collection\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Collection\List.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Home\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Item\Create.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Item\Details.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Item\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Item\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Shared\Collection\_CollectionSimpleCard.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Shared\Collection\_ImageWithPrev.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Shared\Item\_CollectionItemsTBody.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Shared\Item\_Comment.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Shared\Item\_Comments.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Shared\Item\_ItemFieldChBox.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Shared\Item\_ItemFieldText.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Shared\User\_UserLine.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Shared\_DescriptionMarkdownInput.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Shared\_Footer.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Shared\_Layout.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Shared\_LikeBadge.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Shared\_LoginPartial.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Shared\_NavMenu.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Shared\_ValidationScriptsPartial.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\_ViewImports.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\_ViewStart.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Identity\Pages\Account\AccessDenied.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Identity\Pages\Account\ExternalLogin.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Identity\Pages\Account\Lockout.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Identity\Pages\Account\Login.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Identity\Pages\Account\Logout.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Identity\Pages\Account\Manage\_ManageNav.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Identity\Pages\Account\Manage\_ViewImports.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Identity\Pages\Account\Register.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Identity\Pages\Account\_ViewImports.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Identity\Pages\_ValidationScriptsPartial.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Identity\Pages\_ViewImports.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Identity\Pages\_ViewStart.cshtml" />
   </ItemGroup>
 
 </Project>

@@ -1,26 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
 using Collections.DAL;
 using Collections.DAL.Entities;
-using Microsoft.EntityFrameworkCore;
 using Services.Abstractions;
 using Services.Abstractions.Interfaces;
+using Services.DTO;
 
 namespace Services.Impl
 {
-    public class TagService :  BaseCrudService<Tag>,ITagService
+    public class TagService : BaseCrudService<Tag,TagDto>,ITagService
     {
-        public TagService(AppDbContext context) : base(context)
+        public TagService(AppDbContext context, IMapper mapper) : base(context, mapper)
         {
         }
 
-        public IEnumerable<Tag> GetLike(string text)
-            => Set.LikeTag(text).ToArray();
-    }
+        protected override IQueryable<Tag> Include(IQueryable<Tag> query) => query;
 
-    public static class LikeExtension
-    {
-        public static IQueryable<Tag> LikeTag(this IQueryable<Tag> query, string text)
-            => string.IsNullOrEmpty(text) ? query : query.Where(x => x.Name.ToLower().StartsWith(text.ToLower()));
+        public IEnumerable<TagDto> GetLike(string text) => 
+            ProjectTo(Set.Where(x => x.Name.ToLower().StartsWith(text.ToLower()))).ToList();
     }
 }

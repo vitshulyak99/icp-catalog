@@ -1,115 +1,94 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using AutoMapper;
 using Collections.DAL;
 using Collections.DAL.Entities;
 using Collections.DAL.Entities.Identity;
-using Collections.DAL.Expressions;
 using Collections.General;
 using Microsoft.EntityFrameworkCore;
 using Services.Abstractions;
 using Services.Abstractions.Interfaces;
+using Services.DTO;
 
 namespace Services.Impl
 {
-    public class ItemService : BaseCrudService<Item>, IItemService
+    public class ItemService : BaseCrudService<Item,ItemDto>, IItemService
     {
-        public ItemService(AppDbContext context) : base(context)
+        public ItemService(AppDbContext context, IMapper mapper) : base(context, mapper)
         {
-            FieldValues = context.FieldValues;
-            Collections = context.Collections;
-            Comments = context.Comments;
+            Users = context.Set<AppUserRole>();
+            Likes = context.Likes;
         }
-        protected DbSet<FieldValue> FieldValues { get; }
-        protected DbSet<Collection> Collections { get; }
-        protected DbSet<Comment> Comments { get; }
-        protected DbSet<AppUser> Users { get; }
+
+        private DbSet<AppUserRole> Users { get; }
+        private DbSet<Like> Likes { get; }
+
+        public bool HasPermissions(int id, int userId) =>
+            Set.Where(x => x.Id.Equals(id))
+               .Any(x => x.Collection.Owner.Id.Equals(userId)) || Users
+                .Where(x => x.Role.Name.Equals(Constants.Roles.Admin))
+                .Any(x => x.UserId.Equals(userId));
+        
+        protected override IQueryable<Item> Include(IQueryable<Item> query)
+        {
+            return query.Include(x => x.Collection)
+                        .Include(x => x.Comments)
+                        .Include(x => x.Fields)
+                        .Include(x => x.Tags)
+                        .Include(x => x.Likes);
+        }
 
         public bool SetLike(int id, int userId)
         {
-            var item = Set.Where(x => x.Id.Equals(id)).Include(x => x.UserLike).FirstOrDefault();
-            var user = Context.Set<AppUser>().FirstOrDefault(x => x.Id.Equals(userId));
-            if (item is null || user is null) return false;
-            var isLiked = item.UserLike.Contains(user);
-            if (isLiked)
+            Expression<Func<Like,bool>> expression = x => x.ItemId.Equals(id) && x.UserId.Equals(userId);
+            var isExist = Likes.Any(expression);
+
+            if (isExist)
             {
-                item.UserLike.Remove(user);
+                Likes.Remove(Likes.First(x => x.ItemId.Equals(id) && x.UserId.Equals(userId)));
             }
             else
             {
-                item.UserLike.Add(user);
+                Likes.Add(new Like {UserId = userId, ItemId = id});
             }
-            Set.Update(item);
+
             Context.SaveChanges();
-            return isLiked;
+            return !isExist;
         }
 
-        public IQueryable<Item> Search(string text)
+        public IEnumerable<ItemDto> Search(string text)
         {
-            var q1 = Set.FullText(text);
-            var q2 = FieldValues.FullText(text).Select(x => x.Item);
-            var q3 = Collections.FullText(text).SelectMany(x => x.Items);
-            var q4 = Comments.FullText(text).Select(x => x.Item);
-            return q1.Union(q2)
-                     .Union(q3)
-                     .Union(q4)
-                     .Include(x => x.Fields)
-                     .Include(x => x.Tags)
-                     .Include(x => x.UserLike)
-                     .Include(x => x.Comments)
-                     .Include(x => x.Collection).ThenInclude(x=>x.Fields);
-
+            var items = 
+                Set.Where(x => x.SearchVector.Matches(text)
+                               || x.Collection.SearchVector.Matches(text)
+                               || x.Fields.Any(c => c.SearchVector.Matches(text))
+                               || x.Comments.Any(c => c.SearchVector.Matches(text)));
+            return ProjectTo(Include(items)).ToList();
         }
 
-        public IEnumerable<Item> GetByCollection(int id) =>
-            Collections
-                .AsNoTracking()
-                .Where(x => x.Id.Equals(id))
-                .SelectMany(x => x.Items)
-                .Include(x => x.Fields)
-                .Include(x => x.UserLike)
-                .Include(x => x.Tags).ToArray();
+        public IEnumerable<ItemDto> GetByCollection(int id) => 
+            ProjectTo(Include(Set.Where(x => x.Collection.Id.Equals(id)))).ToList();
 
-        public override Item Create(Item entity)
+        public IEnumerable<ItemDto> GetByTag(int id) => 
+            ProjectTo(Include(Set.Where(x => x.Tags.Any(c => c.Id.Equals(id))))).ToList();
+
+        public override ItemDto Create(ItemDto dto)
         {
-            Set.Add(entity);
-            Context.Attach(entity.Collection);
-            entity.Tags.ForEach(x =>
+            var item = Mapper.Map<Item>(dto);
+
+            Context.Attach(item.Collection);
+            item.Fields.ForEach(x => Context.Attach(x.Field));
+            item.Tags.ForEach(x =>
             {
-                if (x.Id > 0) Context.Attach(x);
+                if (x.Id is not 0)
+                {
+                    Context.Attach(x);
+                }
             });
-            entity.Fields.ForEach(x =>
-            {
-                Context.Attach(x.Field);
-            });
-            return base.Create(entity);
+            item = BaseCreate(item);
+            return Mapper.Map<ItemDto>(item);
         }
-
-        public override Item GetById(int id) =>
-            Set.Where(x => x.Id.Equals(id))
-               .Include(x => x.Fields).ThenInclude(x => x.Field)
-               .Include(x => x.Tags)
-               .Include(x => x.UserLike)
-               .FirstOrDefault();
-
-        public override Item Update(Item entity)
-        {
-            entity.Fields.ForEach(x =>
-            {
-                Context.Attach(x);
-                Context.Update(x);
-            });
-            Context.Attach(entity);
-            Context.Update(entity);
-            Context.SaveChanges();
-
-            return base.Update(entity);
-        }
-
-        public bool HasPermissions(int id, int userid) =>
-            Set.Where(x => x.Id.Equals(id)).Select(x => x.Collection.Owner)
-               .Union(Users.Where(x => x.UserRoles.Exists(x => x.Role.Name.Equals(Constants.Roles.Admin))))
-               .Any(x => x.Id.Equals(userid));
     }
-
-    
 }

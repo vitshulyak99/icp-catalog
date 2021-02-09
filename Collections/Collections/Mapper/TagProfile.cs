@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Collections.DAL.Entities;
-using Collections.Models.Item;
+using Services.DTO;
 
 namespace Collections.Mapper
 {
@@ -8,10 +8,9 @@ namespace Collections.Mapper
     {
         public TagProfile()
         {
-            CreateMap<Tag, TagModel>()
-                .ForMember(x=>x.Count, x=>x.MapFrom(c=>c.ItemTags.Count));
-            CreateMap<TagModel, Tag>()
-                .ForMember(x=>x.ItemTags,x=>x.Ignore());
+            CreateMap<Tag, TagDto>();
+            CreateMap<TagDto, Tag>()
+                .ForMember(d=>d.ItemTags,opt=>opt.Ignore());
         }
     }
 }

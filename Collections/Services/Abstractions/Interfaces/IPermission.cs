@@ -2,6 +2,6 @@
 {
     public interface IPermission
     {
-        bool HasPermissions(int id, int userid);
+        bool HasPermissions(int id, int userId);
     }
 }

@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Collections.DAL.Entities;
-using Collections.Models.Collection;
-using Collections.Models.Item;
+using Services.DTO; 
 
 namespace Collections.Mapper
 {
@@ -10,26 +9,16 @@ namespace Collections.Mapper
         public FieldProfile()
         {
 
-            CreateMap<FieldCreateModel, Field>()
-                .ForMember(x => x.Id, x => x.Ignore())
-                .ForMember(x => x.Collection, x => x.Ignore())
-                .ForMember(x=>x.Values,x=>x.Ignore());
+            CreateMap<Field, FieldDto>();
+            CreateMap<FieldDto, Field>()
+                .ForMember(d=>d.SearchVector,opt=>opt.Ignore())
+                .ForMember(d=>d.Values,opt=>opt.Ignore())
+                .ForMember(d=>d.Collection,opt=>opt.Ignore());
 
-            CreateMap<Field, FieldModel>();
-
-            CreateMap<FieldValue, FieldValueModel>()
-                .ForMember(x=>x.FieldId, x=>x.MapFrom(c=>c.Field.Id));
-            CreateMap<FieldValue, FieldValueViewModel>()
-                .IncludeBase<FieldValue, FieldValueModel>();
-            CreateMap<FieldValueModel, FieldValue>()
-                .ForMember(x => x.Field, x => x.MapFrom(c => new Field
-                {
-                    Id = c.FieldId
-                }))
-                .ForMember(x => x.Item, x => x.Ignore())
-                .ForMember(x => x.Id, x => x.Ignore());
-          
-
+            CreateMap<FieldValue, FieldValueDto>();
+            CreateMap<FieldValueDto, FieldValue>()
+                .ForMember(d=>d.SearchVector,opt=>opt.Ignore())
+                .ForMember(d=>d.Item,opt=>opt.Ignore());
         }
     }
 }

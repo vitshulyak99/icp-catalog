@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Collections.DAL;
 using Collections.DAL.Entities;
 using Collections.DAL.Entities.Identity;
@@ -7,62 +9,44 @@ using Collections.General;
 using Microsoft.EntityFrameworkCore;
 using Services.Abstractions;
 using Services.Abstractions.Interfaces;
+using Services.DTO;
 
 namespace Services.Impl
 {
-    public class CollectionService : BaseCrudService<Collection>, ICollectionService
+    public class CollectionService : BaseCrudService<Collection, CollectionDto>, ICollectionService
     {
-        public CollectionService(AppDbContext context) : base(context)
+        protected DbSet<AppUserRole> UserRoles { get; }
+
+        public CollectionService(AppDbContext context, IMapper mapper) : base(context, mapper)
         {
-            this.Users = context.Users;
+            UserRoles = context.Set<AppUserRole>();
         }
 
-        public DbSet<AppUser> Users { get; set; }
+        protected override IQueryable<Collection> Include(IQueryable<Collection> query) =>
+            query.Include(x => x.Owner)
+                 .Include(x => x.Theme)
+                 .Include(x => x.Fields);
 
-        public override Collection Create(Collection entity)
-        {
-            if (entity.Owner == null) return base.Create(entity);
-            Context.Attach(entity.Owner);
-            Context.Attach(entity.Theme);
-            return base.Create(entity);
-        }
-
-        public bool HasPermissions(int id, int userId) =>
+        public virtual bool HasPermissions(int id, int userId) =>
             Set.Where(x => x.Id.Equals(id))
-                       .Select(x => x.Owner)
-                       .Union(Context.Set<AppUserRole>()
-                                     .Where(x => x.Role.Name.Equals(Constants.Roles.Admin))
-                                     .Select(x => x.User))
-                       .Any(x => x.Id.Equals(userId));
+               .Any(x => x.Owner.Id.Equals(userId))
+            || UserRoles.Where(x => x.UserId.Equals(userId))
+                        .Any(x => x.Role.Name.Equals(Constants.Roles.Admin));
 
-        public IEnumerable<Field> GetFields(int collectionId) =>
-            Set.Where(x => x.Id.Equals(collectionId))
-               .SelectMany(x => x.Fields)
-               .ToArray();
+        public virtual IEnumerable<FieldDto> GetFields(int id) =>
+            Set.Where(x => x.Id.Equals(id)).ProjectTo<CollectionDto>(Mapper.ConfigurationProvider)
+               .SelectMany(x => x.Fields).ToList();
 
-        public IEnumerable<Collection> ByUser(int userId)
-            => Set.Where(x => x.Owner.Id.Equals(userId))
-                  .Include(x => x.Theme)
-                  .Include(x => x.Owner)
-                  .Include(x => x.Fields);
+        public virtual IEnumerable<CollectionDto> ByUser(int userId) =>
+            ProjectTo(Include(Set.Where(x => x.Owner.Id.Equals(userId)))).ToList();
 
-        public override IQueryable<Collection> Get() => 
-            Set.Include(x => x.Theme)
-               .Include(x=>x.Owner)
-               .Include(x=>x.Fields);
-
-        public override Collection GetById(int id) => Get().Where(x=>x.Id.Equals(id)).Include(x=>x.Fields).FirstOrDefault();
-
-        public override Collection Update(Collection entity)
+        public override CollectionDto Create(CollectionDto dto)
         {
-            var old = Set.FirstOrDefault(x => x.Id.Equals(entity.Id));
-            if (old is null) return null;
-            Context.Attach(entity.Theme);
-            old.Theme = entity.Theme;
-            old.Title = entity.Title;
-            old.Description = entity.Description;
-            old.Image = entity.Image;
-            return Set.Update(old).Entity;
+            var collection = Mapper.Map<Collection>(dto);
+            Context.Attach(collection.Theme);
+            Context.Attach(collection.Owner);
+            collection = BaseCreate(collection);
+            return Mapper.Map<CollectionDto>(collection);
         }
     }
 }

@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using Collections.DAL.Entities;
+using Services.DTO;
 
 namespace Services.Abstractions.Interfaces
 {
-    public interface IItemService : ICrudService<Item> , IPermission
+    public interface IItemService : ICrudService<ItemDto> , IPermission
     {
         bool SetLike(int id, int userId);
-        IQueryable<Item> Search(string text);
-        IEnumerable<Item> GetByCollection(int id);
+        IEnumerable<ItemDto> Search(string text);
+        IEnumerable<ItemDto> GetByCollection(int id);
+        IEnumerable<ItemDto> GetByTag(int id);
     }
 }
