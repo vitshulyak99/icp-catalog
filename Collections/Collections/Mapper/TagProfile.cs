@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Collections.DAL.Entities;
-using Services.DTO;
+using Services.Dto;
 
 namespace Collections.Mapper
 {
@@ -8,9 +8,11 @@ namespace Collections.Mapper
     {
         public TagProfile()
         {
-            CreateMap<Tag, TagDto>();
+            CreateMap<Tag, TagDto>()
+                .ForMember(d=>d.Uses, opt=>opt.MapFrom(s=>s.ItemTags.Count));
             CreateMap<TagDto, Tag>()
                 .ForMember(d=>d.ItemTags,opt=>opt.Ignore());
         }
+        
     }
 }

@@ -41,7 +41,7 @@ namespace Collections
             });
 
             services.AddAppDbContext(Configuration);
-            var jwtConfiguration = new JwtConfigurationBuilder(Configuration).Build();
+            var jwtConfiguration = JwtConfiguration.Create(Configuration);
             services.AddAuthentication(options =>
                     {
                         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

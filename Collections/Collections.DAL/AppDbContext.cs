@@ -65,9 +65,16 @@ namespace Collections.DAL
 
             builder.Entity<AppUser>(e =>
             {
+                e.HasMany(x => x.UserRoles).WithOne(x=>x.User).HasForeignKey(x=>x.UserId);
+                
                 e.HasMany(x => x.Likes)
                  .WithOne(x => x.User)
                  .HasForeignKey(x => x.UserId);
+            });
+            
+            builder.Entity<AppRole>(e =>
+            {
+                e.HasMany(x => x.UserRoles).WithOne(x => x.Role).HasForeignKey(x => x.RoleId);
             });
 
             builder.Entity<Theme>(
@@ -118,7 +125,7 @@ namespace Collections.DAL
             #endregion
 
             builder.Entity<Tag>()
-                   .HasData(new Tag(1, "SomeTag"), new Tag(2, "SomeTag2"), new Tag(3, "Lamba"));
+                   .HasData(new Tag(1, "Car"), new Tag(2, "Alcohol"), new Tag(3, "Book"),new Tag(4,"Game"));
         }
     }
 }

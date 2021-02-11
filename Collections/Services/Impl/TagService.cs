@@ -5,7 +5,7 @@ using Collections.DAL;
 using Collections.DAL.Entities;
 using Services.Abstractions;
 using Services.Abstractions.Interfaces;
-using Services.DTO;
+using Services.Dto;
 
 namespace Services.Impl
 {

@@ -10,7 +10,7 @@ namespace Collections.DAL.Entities
         public string Description { get; set; }
         public string Image { get; set; }
         public Theme Theme { get; set; }
-        public AppUser Owner { get; set; }
+        public AppUser Owner { get; set; } = new();
         public List<Item> Items { get; set; } = new();
         public List<Field> Fields { get; set; } = new();
         public NpgsqlTsVector SearchVector { get; set; }

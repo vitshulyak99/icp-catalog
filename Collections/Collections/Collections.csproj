@@ -32,13 +32,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="wwwroot\lib\jquery\dist\jquery.min.js">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <_ContentIncludedByDefault Remove="Views\Collection\Create.cshtml" />
     <_ContentIncludedByDefault Remove="Views\Collection\Details.cshtml" />
     <_ContentIncludedByDefault Remove="Views\Collection\Edit.cshtml" />

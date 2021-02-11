@@ -7,7 +7,7 @@ using AutoMapper.QueryableExtensions;
 using Collections.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using Services.Abstractions.Interfaces;
-using Services.DTO;
+using Services.Dto;
 
 namespace Services.Abstractions
 {

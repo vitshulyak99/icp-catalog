@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Services.DTO;
+using Services.Dto;
 
 namespace Services.Abstractions.Interfaces
 {

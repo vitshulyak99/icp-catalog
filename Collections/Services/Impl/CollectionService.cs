@@ -9,7 +9,7 @@ using Collections.General;
 using Microsoft.EntityFrameworkCore;
 using Services.Abstractions;
 using Services.Abstractions.Interfaces;
-using Services.DTO;
+using Services.Dto;
 
 namespace Services.Impl
 {

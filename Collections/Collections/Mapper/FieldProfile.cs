@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Collections.DAL.Entities;
-using Services.DTO; 
+using Services.Dto; 
 
 namespace Collections.Mapper
 {

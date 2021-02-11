@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using Services.DTO;
+using Collections.DAL.Entities;
+using Services.Dto;
 
 namespace Services.Abstractions.Interfaces
 {

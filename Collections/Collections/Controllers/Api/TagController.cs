@@ -28,5 +28,4 @@ namespace Collections.Controllers.Api
         public IActionResult GetAll() => Ok(_tagService.GetAll().ToList());
 
     }
-
 }
